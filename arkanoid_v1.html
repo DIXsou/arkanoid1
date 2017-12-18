@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>arkanoid</title>
+	<style>
+		*{
+			padding: 0px;
+			margin: 0px;
+		}
+		#panelJuego{
+			position: absolute;
+			top: 5px;
+			left: 5px;
+			width: 560px;
+			height: 600px;
+			background-color: darkblue;
+		}
+		#barra {
+			position: absolute;
+			width: 100px;
+			height: 15px;
+			left: 180px;
+			top: 565px;
+			background-color: grey;
+			border-radius: 10px;
+		}
+		#pelotita {
+			position: absolute;
+			width: 20px;
+			height: 20px;
+			top: 515px;
+			left: 215px;
+			border-radius: 10px;
+			background-color: white;	
+		}
+		#panelInicio{
+			position: absolute;
+			top: 100px;
+			margin: 30px;
+			padding: 5px;
+			background-color: sienna;
+			z-index: 1;
+			border: solid 2px black;
+			text-align: center;
+		}
+
+	</style>
+	<script>
+		window.onload = function(){
+			var panelInicio = document.getElementById("panelInicio");
+			var barra = document.getElementById("barra");
+			var pelotita = document.getElementById("pelotita");
+			var panelJuego = document.getElementById("panelJuego");
+			var altoBarra = window.getComputedStyle(barra).getPropertyValue("height").replace("px","")-0;
+			var leftBarra = window.getComputedStyle(barra).getPropertyValue("left").replace("px","")-0;
+			var topBarra = window.getComputedStyle(barra).getPropertyValue("top").replace("px","")-0;
+			var anchoBarra = window.getComputedStyle(barra).getPropertyValue("width").replace("px","")-0;
+			var anchoPanel = window.getComputedStyle(panelJuego).getPropertyValue("width").replace("px","")-0;
+			var altoPanel = window.getComputedStyle(panelJuego).getPropertyValue("height").replace("px","")-0;
+			var topPelotita = window.getComputedStyle(pelotita).getPropertyValue("top").replace("px","")-0;
+			var leftPelotita = window.getComputedStyle(pelotita).getPropertyValue("left").replace("px","")-0;
+			var altoPelotita = window.getComputedStyle(pelotita).getPropertyValue("height").replace("px","")-0;
+			var anchoPelotita = window.getComputedStyle(pelotita).getPropertyValue("width").replace("px","")-0;
+			var velocidades = new Array([],[],[]);
+			var eliminados = 0;
+			var intervalBolita
+			var pause = false;
+			var inicioJuego = true;
+			var finalJuego = false;
+
+			//capturar teclado
+			document.onkeydown = capturarTecla;
+			var antesLeftBarra;
+			function capturarTecla(evento){
+				var codigoTecla = evento.which;
+				if( codigoTecla == 65 ||codigoTecla == 37 ){
+					moverBarra("Izquierda");
+				}
+				else if (codigoTecla== 68  || codigoTecla == 39){
+					moverBarra("Derecha");
+				}
+				else if (codigoTecla == 87 || codigoTecla == 38){
+					estadoJuego("empezar");
+				}
+				else if(codigoTecla == 80 ){
+					pausarJuego();
+				}
+				
+			}
+			
+			//capturar mouse
+			panelJuego.onmousemove = capturarMouse;
+			panelJuego.onclick = capturarMouse;
+			var posicionXMouse;
+			function capturarMouse(event) {
+				posicionXMouse = event.clientX;
+				switch(event.type){
+					case "mousemove":
+						moverBarra("Mouse");
+						break;
+					case "click":
+						pausarJuego();
+						break;
+				}
+			}
+
+			//mover barra
+			var quieto;
+			function moverBarra(direccion) {
+				clearTimeout(quieto);
+				var aux = leftBarra;
+				switch(direccion){
+					case "Izquierda":
+						aux -= 20;
+						break;
+					case "Derecha":
+						aux += 20;
+						break;
+					case "Mouse":
+						aux = posicionXMouse - (anchoBarra/2);
+						break;
+					default:
+				}
+				if(aux + anchoBarra >= anchoPanel){
+				aux = anchoPanel - anchoBarra;
+				}
+				else if(aux <= 0){
+					aux = 0;
+				}
+				if(!inicioJuego && !finalJuego){
+					barra.style.left = aux + "px";
+					antesLeftBarra = leftBarra;
+					leftBarra = aux;
+					quieto = setTimeout(estarQuieto,300);
+				}
+				
+			}
+			function estarQuieto() {
+				antesLeftBarra = leftBarra;
+			}
+
+			//Empezar y finalizar Juego
+			function estadoJuego(nuevoEstado){
+				switch(nuevoEstado){
+					case "finalizar":
+						finalJuego = true;
+						clearInterval(intervalBolita);
+						break;
+					case "empezar":
+						if(inicioJuego){
+							inicioJuego = false;
+							intervalBolita = setInterval(moverPelota,8);
+							panelJuego.removeChild(panelInicio);
+						}
+						
+						
+						break;
+				}
+			}
+
+			// Pausar juego
+			function pausarJuego(){
+				if(!inicioJuego && !finalJuego){
+					if(!pause){
+						clearInterval(intervalBolita);
+						pause = true;
+					}
+					else {
+						intervalBolita = setInterval(moverPelota,8);
+						pause = false;
+					}
+				}
+				
+			}
+			
+			//Carteles fin y principio
+			function fin(juego){
+				estadoJuego("finalizar");
+				var div = document.createElement("div");
+				var elementoH1 = document.createElement("h1");
+				div.appendChild(elementoH1);
+				if(juego == "ganar"){
+					elementoH1.appendChild(document.createTextNode("Ganaste"));
+				}
+				else{
+					elementoH1.appendChild(document.createTextNode("Perdiste"))
+				}
+				panelJuego.appendChild(div);
+				elementoH1.style.color = "white";
+				div.style.backgroundColor = "black";
+				div.style.position = "absolute";
+				div.style.top = "250px";
+				div.style.left = "180px";
+				div.style.padding = "10px 30px";
+				
+
+			}
+			//bloques
+			var bloques = new Array([],[],[]);
+			const numBloques = 10;
+			const alturaBloque = 15;
+			const anchoBloque = 60;
+			for (var i = 0; i < numBloques; i++) {
+				var bloque = document.createElement("div");
+				bloque.style.background = "green";
+				bloque.style.position = "absolute";
+				bloque.style.height = alturaBloque + "px";
+				bloque.style.width = anchoBloque +"px";
+				bloques[0][i] = bloque;
+				introducirBloque(bloque,i);
+			} 
+			
+			function introducirBloque(bloque, indice){
+				var encaja;
+				do{
+					encaja = true;
+					var topBloque = (Math.random()*(altoPanel/2)).toFixed(0);
+					var leftBloque = (Math.random()*(anchoPanel-anchoBloque)).toFixed(0);
+					for (var i = 0 ; i < indice ; i++){
+						var maxRangoY = bloques[1][i]- 0 + alturaBloque;
+						var minRangoY = bloques[1][i] - alturaBloque;
+						var maxRangoX = bloques[2][i]- 0 + anchoBloque;
+						var minRangoX = bloques[2][i] - anchoBloque; 
+						if(topBloque > minRangoY && topBloque < maxRangoY && leftBloque > minRangoX && leftBloque < maxRangoX) {
+							encaja=false;   
+						}
+					} 
+				}while(!encaja);
+				bloque.style.top = topBloque +"px";
+				bloque.style.left = leftBloque + "px";
+				bloques[1][indice] = topBloque;
+				bloques[2][indice] = leftBloque;
+
+				panelJuego.appendChild(bloque);
+			}
+
+			function borrarBloque(indice){
+				panelJuego.removeChild(bloques[0][indice]);
+				bloques[1][indice] = - alturaBloque;
+				bloques[2][indice] = - anchoBloque;
+				eliminados++;
+				if(eliminados == numBloques){
+					fin("ganar");
+				}
+			}
+			
+		   
+
+			//movimiento de la pelota
+			var velX = 0;
+			var velY = -2;
+			var midPelotitaX;
+			var midPelotitaY;
+			function moverPelota() {
+				choqueX(leftPelotita + velX);
+				choqueY(topPelotita + velY);
+				choqueBloques(leftPelotita + velX,topPelotita + velY)
+				if(!inicioJuego && !finalJuego){
+					pelotita.style.left = leftPelotita + "px";
+					pelotita.style.top = topPelotita + "px";   
+				}
+			}
+
+			function choqueX(valorTotal) {
+				if(valorTotal + anchoPelotita > anchoPanel){
+					leftPelotita = anchoPanel - anchoPelotita;
+					velX *= -1;
+				}
+				else if(valorTotal < 0){
+					leftPelotita = 0;
+					velX *= -1;
+				}
+				else{
+					leftPelotita = valorTotal;
+				}
+			}
+
+			function choqueY(valorTotal){
+				if (valorTotal < 0 ){
+					topPelotita = 0;
+					velY *= -1;
+				}
+				else if(choqueBarra(valorTotal)){
+					topPelotita = topBarra - altoPelotita;
+					velY *= -1;
+				}
+				else if( valorTotal + altoPelotita >= altoPanel){
+					topPelotita = altoPanel - altoPelotita;
+					fin("perder");
+				}
+				else{
+					topPelotita = valorTotal
+				}
+			}
+			
+			function choqueBarra (valorTotal){
+				if(valorTotal + altoPelotita >= topBarra && valorTotal  < topBarra + altoBarra){
+					var primeraMarca = leftBarra + 10;
+					var segundaMarca = leftBarra + anchoBarra - 10;
+					if(leftPelotita + anchoPelotita > leftBarra && leftPelotita + anchoPelotita < primeraMarca){
+						if(velX > -4){
+							velX -= 1;
+						}
+						return true;
+					}
+					else if(leftPelotita + anchoPelotita >= primeraMarca && leftPelotita <= segundaMarca ){
+						if(antesLeftBarra > leftBarra){
+							if(velX > -4){
+							velX -= 1;
+							}     
+						}
+						else if(antesLeftBarra < leftBarra){
+							if(velX < 4){
+							velX += 1;
+							}
+						}
+						return true;
+					}
+					else if(leftPelotita < leftBarra + anchoBarra && leftPelotita > segundaMarca){
+						if(velX < 4){
+							velX += 1;
+						}
+						return true;
+					}
+					
+				}
+				return false;
+			}
+
+			function choqueBloques(valorTotalX,valorTotalY){
+				for(var i = 0; i < bloques[0].length ; i++){
+					if(valorTotalX < bloques[2][i] - 0 + anchoBloque && valorTotalX - 0 + anchoPelotita  > bloques[2][i] && valorTotalY < bloques[1][i] - 0 + alturaBloque && valorTotalY - 0 + altoPelotita > bloques[1][i] ){
+						if(valorTotalX >= bloques[2][i] - 4 + anchoBloque){
+							leftPelotita = bloques[2][i] - 0 + anchoBloque;
+							velX *= -1;
+						   
+						}
+						else if(valorTotalX - 0 + anchoPelotita  <= bloques[2][i]- 0 + 4){
+							leftPelotita = bloques[2][i] - anchoPelotita;
+							velX *= -1;
+						}
+						else if(valorTotalY >= bloques[1][i] - 4 + alturaBloque){
+							topPelotita = bloques[1][i] - 0 + alturaBloque;
+							velY *= -1;
+						}
+						else if(valorTotalY - 0 + altoPelotita <= bloques[1][i] - 0 + 4){
+							topPelotita = bloques[1][i] - altoPelotita;
+							velY *= -1;
+						}
+						borrarBloque(i);
+					}
+				}
+				
+			}
+
+
+
+
+		}
+	</script>
+</head>
+<body>
+	<div id="panelJuego">
+		<div id="panelInicio">
+			<h1>Arkanoid</h1>
+			<br/>
+			<p>Debes golpear los bloques con la pelotita, ganas si todos los bloques son eliminados. Si la pelotita golpea el fondo pierdes, debes evitarlo con la raqueta.</p>
+			<p>Dependiendo del movimiento que lleve la raqueta podrá modificar el angulo de rebote de la pelotita.</p>
+			<p>Aprieta "W" o click izquierdo para salir de este panel y vuelve a hacerlo para comenzar el juego.</p>
+			<p>Si quieres pausar el juego tambien con click o "W"</p>
+			<br/>
+			<h3>Mucha Suerte</h3>
+			<h6>Creado por: Diego A Sosa Urviola</h6>
+		</div>
+		<div id="barra"></div>
+		<div id="pelotita"></div>
+		 
+	</div>
+	
+</body>
+</html>
