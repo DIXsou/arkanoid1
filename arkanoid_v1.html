@@ -62,7 +62,6 @@
 			var leftPelotita = window.getComputedStyle(pelotita).getPropertyValue("left").replace("px","")-0;
 			var altoPelotita = window.getComputedStyle(pelotita).getPropertyValue("height").replace("px","")-0;
 			var anchoPelotita = window.getComputedStyle(pelotita).getPropertyValue("width").replace("px","")-0;
-			var velocidades = new Array([],[],[]);
 			var eliminados = 0;
 			var intervalBolita
 			var pause = false;
@@ -136,6 +135,7 @@
 				}
 				
 			}
+
 			function estarQuieto() {
 				antesLeftBarra = leftBarra;
 			}
@@ -153,8 +153,6 @@
 							intervalBolita = setInterval(moverPelota,8);
 							panelJuego.removeChild(panelInicio);
 						}
-						
-						
 						break;
 				}
 			}
@@ -196,6 +194,7 @@
 				
 
 			}
+
 			//bloques
 			var bloques = new Array([],[],[]);
 			const numBloques = 10;
@@ -248,7 +247,7 @@
 		   
 
 			//movimiento de la pelota
-			var velX = 0;
+			var velX = 2;
 			var velY = -2;
 			var midPelotitaX;
 			var midPelotitaY;
@@ -299,28 +298,24 @@
 					var primeraMarca = leftBarra + 10;
 					var segundaMarca = leftBarra + anchoBarra - 10;
 					if(leftPelotita + anchoPelotita > leftBarra && leftPelotita + anchoPelotita < primeraMarca){
-						if(velX > -4){
-							velX -= 1;
-						}
+						velX = 4;
 						return true;
 					}
 					else if(leftPelotita + anchoPelotita >= primeraMarca && leftPelotita <= segundaMarca ){
 						if(antesLeftBarra > leftBarra){
-							if(velX > -4){
+							if(velX > -3){
 							velX -= 1;
 							}     
 						}
 						else if(antesLeftBarra < leftBarra){
-							if(velX < 4){
-							velX += 1;
+							if(velX < 3){
+								velX += 1;
 							}
 						}
 						return true;
 					}
 					else if(leftPelotita < leftBarra + anchoBarra && leftPelotita > segundaMarca){
-						if(velX < 4){
-							velX += 1;
-						}
+						velX = -4;
 						return true;
 					}
 					
