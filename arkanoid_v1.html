@@ -63,7 +63,6 @@
 			var altoPelotita = window.getComputedStyle(pelotita).getPropertyValue("height").replace("px","")-0;
 			var anchoPelotita = window.getComputedStyle(pelotita).getPropertyValue("width").replace("px","")-0;
 			var eliminados = 0;
-			var intervalBolita
 			var pause = false;
 			var inicioJuego = true;
 			var finalJuego = false;
@@ -240,7 +239,8 @@
 				bloques[2][indice] = - anchoBloque;
 				eliminados++;
 				if(eliminados == numBloques){
-					fin("ganar");
+					fin("ganar")
+					;
 				}
 			}
 			
@@ -249,8 +249,6 @@
 			//movimiento de la pelota
 			var velX = 2;
 			var velY = -2;
-			var midPelotitaX;
-			var midPelotitaY;
 			function moverPelota() {
 				choqueX(leftPelotita + velX);
 				choqueY(topPelotita + velY);
@@ -348,10 +346,6 @@
 				}
 				
 			}
-
-
-
-
 		}
 	</script>
 </head>
@@ -362,8 +356,9 @@
 			<br/>
 			<p>Debes golpear los bloques con la pelotita, ganas si todos los bloques son eliminados. Si la pelotita golpea el fondo pierdes, debes evitarlo con la raqueta.</p>
 			<p>Dependiendo del movimiento que lleve la raqueta podrá modificar el angulo de rebote de la pelotita.</p>
-			<p>Aprieta "W" o click izquierdo para salir de este panel y vuelve a hacerlo para comenzar el juego.</p>
-			<p>Si quieres pausar el juego tambien con click o "W"</p>
+			<p>El moviemiento es con las teclas "A" y "D", o las flechas o el ratón.</p>
+			<p>Aprieta "W" para comenzar el juego.</p>
+			<p>Si quieres pausar el juego tambien con click o "P"</p>
 			<br/>
 			<h3>Mucha Suerte</h3>
 			<h6>Creado por: Diego A Sosa Urviola</h6>
